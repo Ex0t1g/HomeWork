@@ -1,4 +1,5 @@
 
+
 #include <iostream>
 #include <list>
 using namespace std;
@@ -10,8 +11,8 @@ protected:
     int shootCount;
     int maxAmmo;
 public:
+
     Weapon(int damage, int shootCount, int maxAmmo) : damage(damage), shootCount(shootCount), maxAmmo(maxAmmo) {}
-    virtual ~Weapon() {}
     virtual int shoot()
     {
         if (shootCount > 0) {
@@ -24,8 +25,8 @@ public:
 
 class Blaster : public Weapon {
 public:
-    Blaster() : Weapon(10, -1, -1) {}
-    virtual int shoot()
+    Blaster() : Weapon(10, INT_MAX ,INT_MAX) {} // Бесконечные патроны
+    int shoot() override
     {
         return damage;
     }
@@ -52,17 +53,21 @@ int main()
     weapons.push_back(pistol);
     weapons.push_back(machineGun);
 
-    while (weapons.size() > 1) {
-        Weapon* currentWeapon = weapons.front();
-        cout << "Damage: " << currentWeapon->shoot() << endl;
-
-        if (dynamic_cast<Blaster*>(currentWeapon) == nullptr && currentWeapon->shootCount == 0) {
-            delete currentWeapon;
-            weapons.pop_front();
+    int currentEnemyHP = 1000;
+    while (true) {
+        for (Weapon* weapon : weapons) {
+            int damage = weapon->shoot();
+            currentEnemyHP -= damage;
+            cout << "Damage: " << damage << " Current Enemy HP: " << currentEnemyHP << endl;
+            if (currentEnemyHP <= 0) {
+                cout << "Enemy killed!" << endl;
+                break;
+            }
         }
 
-        weapons.push_back(currentWeapon);
-        weapons.pop_front();
+        if (currentEnemyHP <= 0) {
+            break;
+        }
     }
 
     for (Weapon* weapon : weapons) {
