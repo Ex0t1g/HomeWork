@@ -1,3 +1,4 @@
+
 #include <iostream>
 #include <list>
 using namespace std;
@@ -9,15 +10,23 @@ protected:
     int shootCount;
     int maxAmmo;
 public:
-
     Weapon(int damage, int shootCount, int maxAmmo) : damage(damage), shootCount(shootCount), maxAmmo(maxAmmo) {}
-    virtual int shoot() = 0;
+    virtual ~Weapon() {}
+    virtual int shoot()
+    {
+        if (shootCount > 0) {
+            shootCount--;
+            return damage;
+        }
+        return 0;
+    }
 };
 
 class Blaster : public Weapon {
 public:
     Blaster() : Weapon(10, -1, -1) {}
-    int shoot() {
+    virtual int shoot()
+    {
         return damage;
     }
 };
@@ -25,25 +34,11 @@ public:
 class Pistol : public Weapon {
 public:
     Pistol() : Weapon(20, 6, 6) {}
-    int shoot() {
-        if (shootCount > 0) {
-            shootCount--;
-            return damage;
-        }
-        return 0;
-    }
 };
 
 class MachineGun : public Weapon {
 public:
     MachineGun() : Weapon(5, 100, 100) {}
-    int shoot() {
-        if (shootCount > 0) {
-            shootCount--;
-            return damage;
-        }
-        return 0;
-    }
 };
 
 int main()
@@ -61,7 +56,7 @@ int main()
         Weapon* currentWeapon = weapons.front();
         cout << "Damage: " << currentWeapon->shoot() << endl;
 
-        if (currentWeapon->shootCount == 0) {
+        if (dynamic_cast<Blaster*>(currentWeapon) == nullptr && currentWeapon->shootCount == 0) {
             delete currentWeapon;
             weapons.pop_front();
         }
